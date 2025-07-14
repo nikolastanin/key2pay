@@ -38,6 +38,16 @@ class WC_Key2Pay_Redirect_Gateway extends WC_Payment_Gateway
      * This creates a payment session and returns a redirect URL.
      */
     public const API_REDIRECT_ENDPOINT = 'https://api.key2payment.com/PaymentToken/Create';
+    
+    /**
+     * Payment method type for redirect-based payments.
+     */
+    public const PAYMENT_METHOD_TYPE = 'PHQR';
+    
+    /**
+     * Default language for payment page.
+     */
+    public const DEFAULT_LANGUAGE = 'en';
 
     /**
      * Constructor for the gateway.
@@ -46,7 +56,6 @@ class WC_Key2Pay_Redirect_Gateway extends WC_Payment_Gateway
     {
         // Initialize logger
         $this->log = wc_get_logger();
-        $this->log->debug('Key2Pay Debug: Redirect gateway constructor called', array('source' => 'key2pay-redirect'));
         
         $this->id                 = 'key2pay_redirect'; // Unique ID for redirect gateway.
         $this->icon               = apply_filters('woocommerce_key2pay_redirect_icon', plugin_dir_url(dirname(__FILE__)) . 'assets/images/key2pay-admin.webp');
@@ -65,20 +74,12 @@ class WC_Key2Pay_Redirect_Gateway extends WC_Payment_Gateway
         $this->debug          = 'yes' === $this->get_option('debug');
         
         // Get credentials from admin settings
-        $this->merchant_id    = $this->get_option('merchant_id');
-        $this->password       = $this->get_option('password');
+        $this->merchant_id    = sanitize_text_field($this->get_option('merchant_id'));
+        $this->password       = sanitize_text_field($this->get_option('password'));
 
-        // Debug the title setting
-        $log_file = WP_CONTENT_DIR . '/uploads/mycustomlog.log';
-        $log_message = '[' . date('Y-m-d H:i:s') . '] Key2Pay Debug: Redirect gateway - Title from settings: ' . $this->title . PHP_EOL;
-        error_log($log_message, 3, $log_file);
-        
-        // Force the title for testing
-        $this->title = 'Key2Pay Secure Redirect';
-        $log_message = '[' . date('Y-m-d H:i:s') . '] Key2Pay Debug: Redirect gateway - Title forced to: ' . $this->title . PHP_EOL;
-        error_log($log_message, 3, $log_file);
 
-        // Initialize authentication handler with credentials (custom or fallback)
+
+        // Initialize authentication handler
         try {
             $this->auth_handler = new WC_Key2Pay_Auth('basic');
             $this->auth_handler->set_credentials(array(
@@ -86,9 +87,8 @@ class WC_Key2Pay_Redirect_Gateway extends WC_Payment_Gateway
                 'password' => $this->password,
             ));
             $this->auth_handler->set_debug($this->debug);
-            $this->log->debug('Key2Pay Debug: Auth handler initialized successfully', array('source' => 'key2pay-redirect'));
         } catch (Exception $e) {
-            $this->log->error('Key2Pay Debug: Error initializing auth handler: ' . $e->getMessage(), array('source' => 'key2pay-redirect'));
+            $this->log->error('Key2Pay Error: Failed to initialize auth handler: ' . $e->getMessage(), array('source' => 'key2pay-redirect'));
         }
 
         // Add hooks for admin settings and payment processing.
@@ -177,10 +177,12 @@ class WC_Key2Pay_Redirect_Gateway extends WC_Payment_Gateway
 
     /**
      * Process the payment for redirect-based payments.
-     * This creates a payment session and redirects the customer.
+     * 
+     * This method creates a payment session with Key2Pay and redirects the customer
+     * to their hosted payment page. The payment status will be updated via webhook.
      *
      * @param int $order_id Order ID.
-     * @return array An array of results.
+     * @return array An array with 'result' and 'redirect' keys.
      */
     public function process_payment($order_id)
     {
@@ -197,35 +199,29 @@ class WC_Key2Pay_Redirect_Gateway extends WC_Payment_Gateway
         $customer_ip      = WC_Geolocation::get_ip_address();
         $server_url       = WC()->api_request_url('wc_key2pay_redirect_gateway'); // Webhook endpoint for this gateway.
         
-        // Debug currency and language information
-        $log_file = WP_CONTENT_DIR . '/uploads/mycustomlog.log';
-        $log_message = '[' . date('Y-m-d H:i:s') . '] Key2Pay Debug: Redirect gateway - Order currency: ' . $currency . ', Amount: ' . $amount . PHP_EOL;
-        error_log($log_message, 3, $log_file);
-        
-        $log_message = '[' . date('Y-m-d H:i:s') . '] Key2Pay Debug: Redirect gateway - Using hardcoded language: en' . PHP_EOL;
-        error_log($log_message, 3, $log_file);
 
-        // Use credentials from settings (with fallback to hardcoded)
+
+        // Prepare request data for Key2Pay API
         $request_data = array(
             'merchantid'        => $this->merchant_id,
             'password'          => $this->password,
-            'payment_method'    => array('type' => 'PHQR'), // Use PHQR for redirect-based payments
+            'payment_method'    => array('type' => self::PAYMENT_METHOD_TYPE),
             'trackid'           => $order->get_id() . '_' . time(),
-            'bill_currencycode' => $currency, // Dynamic currency from WooCommerce settings
+            'bill_currencycode' => $currency,
             'bill_amount'       => $amount,
             'returnUrl'         => $return_url,
             'returnUrl_on_failure' => $order->get_checkout_payment_url(false),
-            'productdesc'       => sprintf(__('Order %s from %s', 'woocommerce-key2pay-gateway'), $order->get_order_number(), get_bloginfo('name')),
+            'productdesc'       => sprintf(__('Order %s from %s', 'key2pay'), $order->get_order_number(), get_bloginfo('name')),
             'bill_customerip'   => $customer_ip,
-            'bill_phone'        => $order->get_billing_phone() ?: '59101883',
+            'bill_phone'        => $order->get_billing_phone() ?: '',
             'bill_email'        => $order->get_billing_email(),
-            'bill_country'      => $order->get_billing_country() ?: 'US',
-            'bill_city'         => $order->get_billing_city() ?: 'test',
-            'bill_state'        => $order->get_billing_state() ?: 'test',
-            'bill_address'      => $order->get_billing_address_1() ?: 'test',
+            'bill_country'      => $order->get_billing_country() ?: '',
+            'bill_city'         => $order->get_billing_city() ?: '',
+            'bill_state'        => $order->get_billing_state() ?: '',
+            'bill_address'      => $order->get_billing_address_1() ?: '',
             'bill_zip'          => $order->get_billing_postcode(),
-            'serverUrl'         => $server_url, // Required for webhooks
-            'lang'              => 'en', // Always use English language
+            'serverUrl'         => $server_url,
+            'lang'              => self::DEFAULT_LANGUAGE,
         );
 
         // Get authentication headers
@@ -253,7 +249,7 @@ class WC_Key2Pay_Redirect_Gateway extends WC_Payment_Gateway
 
         if (is_wp_error($response)) {
             $error_message = $response->get_error_message();
-            wc_add_notice(sprintf(__('Key2Pay redirect payment error: %s', 'woocommerce-key2pay-gateway'), $error_message), 'error');
+            wc_add_notice(sprintf(__('Key2Pay redirect payment error: %s', 'key2pay'), $error_message), 'error');
             if ($this->debug) {
                 $this->log->error(sprintf('Key2Pay redirect API Request Failed for order #%s: %s', $order_id, $error_message), array('source' => 'key2pay-redirect'));
             }
@@ -274,7 +270,7 @@ class WC_Key2Pay_Redirect_Gateway extends WC_Payment_Gateway
         if (isset($data->type) && 'valid' === $data->type) {
             if (isset($data->redirectUrl) && ! empty($data->redirectUrl)) {
                 // Payment session created successfully, redirect customer to Key2Pay.
-                $order->update_status('pending', __('Awaiting Key2Pay payment confirmation.', 'woocommerce-key2pay-gateway'));
+                $order->update_status('pending', __('Awaiting Key2Pay payment confirmation.', 'key2pay'));
 
                 // Store Key2Pay transaction details.
                 if (isset($data->transactionid)) {
@@ -291,8 +287,8 @@ class WC_Key2Pay_Redirect_Gateway extends WC_Payment_Gateway
                 );
             } else {
                 // Valid response but no redirect URL, which is unexpected.
-                $error_message = isset($data->error_text) ? $data->error_text : __('Payment session created, but no redirection URL received.', 'woocommerce-key2pay-gateway');
-                wc_add_notice(sprintf(__('Key2Pay redirect failed: %s', 'woocommerce-key2pay-gateway'), $error_message), 'error');
+                $error_message = isset($data->error_text) ? $data->error_text : __('Payment session created, but no redirection URL received.', 'key2pay');
+                wc_add_notice(sprintf(__('Key2Pay redirect failed: %s', 'key2pay'), $error_message), 'error');
                 if ($this->debug) {
                     $this->log->error(sprintf('Key2Pay redirect Missing Redirect URL for order #%s: %s', $order_id, $error_message), array('source' => 'key2pay-redirect'));
                 }
@@ -303,8 +299,8 @@ class WC_Key2Pay_Redirect_Gateway extends WC_Payment_Gateway
             }
         } else {
             // Payment session creation failed or API returned an error.
-            $error_message = isset($data->error_text) ? $data->error_text : __('An unknown error occurred with Key2Pay redirect.', 'woocommerce-key2pay-gateway');
-            wc_add_notice(sprintf(__('Key2Pay redirect payment failed: %s', 'woocommerce-key2pay-gateway'), $error_message), 'error');
+            $error_message = isset($data->error_text) ? $data->error_text : __('An unknown error occurred with Key2Pay redirect.', 'key2pay');
+            wc_add_notice(sprintf(__('Key2Pay redirect payment failed: %s', 'key2pay'), $error_message), 'error');
             if ($this->debug) {
                 $this->log->error(sprintf('Key2Pay redirect API Error for order #%s: %s', $order_id, $error_message), array('source' => 'key2pay-redirect'));
             }
@@ -322,7 +318,7 @@ class WC_Key2Pay_Redirect_Gateway extends WC_Payment_Gateway
     {
         $order = wc_get_order($order_id);
         if ($order->has_status('pending')) {
-            echo wpautop(wp_kses_post(__('Your order is awaiting payment confirmation from Key2Pay. We will update your order status once the payment is confirmed.', 'woocommerce-key2pay-gateway')));
+            echo wpautop(wp_kses_post(__('Your order is awaiting payment confirmation from Key2Pay. We will update your order status once the payment is confirmed.', 'key2pay')));
         }
     }
 
@@ -332,27 +328,23 @@ class WC_Key2Pay_Redirect_Gateway extends WC_Payment_Gateway
      */
     public function handle_webhook_callback()
     {
-        $log_file = WP_CONTENT_DIR . '/uploads/mycustomlog.log';
-        $log_message = '[' . date('Y-m-d H:i:s') . '] Key2Pay Debug: Redirect webhook callback received' . PHP_EOL;
-        error_log($log_message, 3, $log_file);
-
         // Get the raw POST data
         $raw_data = file_get_contents('php://input');
-        $log_message = '[' . date('Y-m-d H:i:s') . '] Key2Pay Debug: Webhook raw data: ' . $raw_data . PHP_EOL;
-        error_log($log_message, 3, $log_file);
 
         // Parse the webhook data
         $webhook_data = json_decode($raw_data, true);
         
         if (!$webhook_data) {
-            $log_message = '[' . date('Y-m-d H:i:s') . '] Key2Pay Debug: Failed to parse webhook data' . PHP_EOL;
-            error_log($log_message, 3, $log_file);
+            if ($this->debug) {
+                $this->log->error('Key2Pay Webhook: Failed to parse webhook data', array('source' => 'key2pay-redirect'));
+            }
             status_header(400);
             exit();
         }
 
-        $log_message = '[' . date('Y-m-d H:i:s') . '] Key2Pay Debug: Webhook data: ' . print_r($webhook_data, true) . PHP_EOL;
-        error_log($log_message, 3, $log_file);
+        if ($this->debug) {
+            $this->log->debug('Key2Pay Webhook: Received data: ' . print_r($webhook_data, true), array('source' => 'key2pay-redirect'));
+        }
 
         // Extract order information
         $track_id = isset($webhook_data['trackid']) ? $webhook_data['trackid'] : '';
@@ -372,29 +364,33 @@ class WC_Key2Pay_Redirect_Gateway extends WC_Payment_Gateway
         }
 
         if (!$order) {
-            $log_message = '[' . date('Y-m-d H:i:s') . '] Key2Pay Debug: Order not found for track_id: ' . $track_id . PHP_EOL;
-            error_log($log_message, 3, $log_file);
+            if ($this->debug) {
+                $this->log->error('Key2Pay Webhook: Order not found for track_id: ' . $track_id, array('source' => 'key2pay-redirect'));
+            }
             status_header(404);
             exit();
         }
 
-        $log_message = '[' . date('Y-m-d H:i:s') . '] Key2Pay Debug: Processing webhook for order #' . $order->get_id() . PHP_EOL;
-        error_log($log_message, 3, $log_file);
+        if ($this->debug) {
+            $this->log->debug('Key2Pay Webhook: Processing order #' . $order->get_id(), array('source' => 'key2pay-redirect'));
+        }
 
         // Process the payment status
         if ($result === 'CAPTURED') {
             // Payment successful
             $order->payment_complete($transaction_id);
-            $order->add_order_note(sprintf(__('Key2Pay payment completed successfully. Transaction ID: %s', 'woocommerce-key2pay-gateway'), $transaction_id));
+            $order->add_order_note(sprintf(__('Key2Pay payment completed successfully. Transaction ID: %s', 'key2pay'), $transaction_id));
             
-            $log_message = '[' . date('Y-m-d H:i:s') . '] Key2Pay Debug: Order #' . $order->get_id() . ' marked as paid' . PHP_EOL;
-            error_log($log_message, 3, $log_file);
+            if ($this->debug) {
+                $this->log->debug('Key2Pay Webhook: Order #' . $order->get_id() . ' marked as paid', array('source' => 'key2pay-redirect'));
+            }
         } else {
             // Payment failed
-            $order->update_status('failed', sprintf(__('Key2Pay payment failed. Result: %s, Error: %s', 'woocommerce-key2pay-gateway'), $result, $error_text));
+            $order->update_status('failed', sprintf(__('Key2Pay payment failed. Result: %s, Error: %s', 'key2pay'), $result, $error_text));
             
-            $log_message = '[' . date('Y-m-d H:i:s') . '] Key2Pay Debug: Order #' . $order->get_id() . ' marked as failed' . PHP_EOL;
-            error_log($log_message, 3, $log_file);
+            if ($this->debug) {
+                $this->log->debug('Key2Pay Webhook: Order #' . $order->get_id() . ' marked as failed', array('source' => 'key2pay-redirect'));
+            }
         }
 
         // Always acknowledge the webhook

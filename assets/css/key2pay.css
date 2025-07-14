@@ -78,7 +78,7 @@ div#key2pay_redirect *>img.woocommerce-list__item-image {
 
 /* Payment method description styling */
 
-.wc_payment_methods .payment_method_key2pay_instapay .payment_method_description {
+.wc_payment_methods .payment_method_key2pay_redirect .payment_method_description {
     color: #666;
     font-size: 0.9em;
     margin-top: 5px;
