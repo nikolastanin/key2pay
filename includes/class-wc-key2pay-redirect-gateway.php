@@ -64,17 +64,9 @@ class WC_Key2Pay_Redirect_Gateway extends WC_Payment_Gateway
         $this->enabled        = $this->get_option('enabled');
         $this->debug          = 'yes' === $this->get_option('debug');
         
-        // Get credentials with fallback to hardcoded values
+        // Get credentials from admin settings
         $this->merchant_id    = $this->get_option('merchant_id');
         $this->password       = $this->get_option('password');
-        
-        // Fallback to hardcoded credentials if not set
-        if (empty($this->merchant_id)) {
-            $this->merchant_id = 'GatewaytestMain';
-        }
-        if (empty($this->password)) {
-            $this->password = '*F8xR9hgz$';
-        }
 
         // Debug the title setting
         $log_file = WP_CONTENT_DIR . '/uploads/mycustomlog.log';
@@ -136,19 +128,19 @@ class WC_Key2Pay_Redirect_Gateway extends WC_Payment_Gateway
             'credentials_section' => array(
                 'title'       => __('Key2Pay Credentials', 'key2pay'),
                 'type'        => 'title',
-                'description' => __('Enter your Key2Pay credentials. If left empty, test credentials will be used.', 'key2pay'),
+                'description' => __('Enter your Key2Pay credentials. These are required for the gateway to work.', 'key2pay'),
             ),
             'merchant_id' => array(
                 'title'       => __('Merchant ID', 'key2pay'),
                 'type'        => 'text',
-                'description' => __('Your Key2Pay Merchant ID. Leave empty to use test credentials.', 'key2pay'),
+                'description' => __('Your Key2Pay Merchant ID.', 'key2pay'),
                 'default'     => '',
                 'desc_tip'    => true,
             ),
             'password' => array(
                 'title'       => __('Password', 'key2pay'),
                 'type'        => 'password',
-                'description' => __('Your Key2Pay API Password. Leave empty to use test credentials.', 'key2pay'),
+                'description' => __('Your Key2Pay API Password.', 'key2pay'),
                 'default'     => '',
                 'desc_tip'    => true,
             ),
@@ -436,41 +428,27 @@ class WC_Key2Pay_Redirect_Gateway extends WC_Payment_Gateway
         $log_message = '[' . date('Y-m-d H:i:s') . '] Key2Pay Debug: Redirect gateway is_available() called' . PHP_EOL;
         error_log($log_message, 3, $log_file);
         
-        $log_message = '[' . date('Y-m-d H:i:s') . '] Key2Pay Debug: Gateway enabled: ' . $this->enabled . PHP_EOL;
-        error_log($log_message, 3, $log_file);
-        
-        $log_message = '[' . date('Y-m-d H:i:s') . '] Key2Pay Debug: Gateway ID: ' . $this->id . PHP_EOL;
-        error_log($log_message, 3, $log_file);
-        
-        $log_message = '[' . date('Y-m-d H:i:s') . '] Key2Pay Debug: Gateway title: ' . $this->method_title . PHP_EOL;
-        error_log($log_message, 3, $log_file);
-        
-        $log_message = '[' . date('Y-m-d H:i:s') . '] Key2Pay Debug: Gateway get_title(): ' . $this->get_title() . PHP_EOL;
-        error_log($log_message, 3, $log_file);
-        
-        // TEMPORARILY DISABLE ALL CHECKS FOR TESTING
-        // TODO: Re-enable proper checks for production
-        
-        $log_message = '[' . date('Y-m-d H:i:s') . '] Key2Pay Debug: Redirect gateway - ALL CHECKS DISABLED FOR TESTING' . PHP_EOL;
-        error_log($log_message, 3, $log_file);
-        
-        // Always return true for now - like Direct Bank Transfer
-        return true;
-        
-        /*
-        // Original checks (commented out for testing)
+        // Check if gateway is enabled
         if ('yes' !== $this->enabled) {
+            $log_message = '[' . date('Y-m-d H:i:s') . '] Key2Pay Debug: Gateway disabled' . PHP_EOL;
+            error_log($log_message, 3, $log_file);
             return false;
         }
 
-        if (!$this->auth_handler->is_configured()) {
+        // Check if credentials are provided
+        if (empty($this->merchant_id) || empty($this->password)) {
+            $log_message = '[' . date('Y-m-d H:i:s') . '] Key2Pay Debug: Missing credentials - merchant_id: ' . (empty($this->merchant_id) ? 'empty' : 'set') . ', password: ' . (empty($this->password) ? 'empty' : 'set') . PHP_EOL;
+            error_log($log_message, 3, $log_file);
+            
             if (is_admin() && current_user_can('manage_woocommerce') && (! defined('DOING_AJAX') || ! DOING_AJAX)) {
-                wc_print_notice(sprintf(__('Key2Pay redirect is enabled but authentication is not properly configured. %sClick here to configure.%s', 'woocommerce-key2pay-gateway'), '<a href="' . admin_url('admin.php?page=wc-settings&tab=checkout&section=' . $this->id) . '">', '</a>'), 'error');
+                wc_print_notice(sprintf(__('Key2Pay redirect is enabled but credentials are not configured. %sClick here to configure.%s', 'key2pay'), '<a href="' . admin_url('admin.php?page=wc-settings&tab=checkout&section=' . $this->id) . '">', '</a>'), 'error');
             }
             return false;
         }
 
+        $log_message = '[' . date('Y-m-d H:i:s') . '] Key2Pay Debug: Gateway available - all checks passed' . PHP_EOL;
+        error_log($log_message, 3, $log_file);
+        
         return parent::is_available();
-        */
     }
 } 
