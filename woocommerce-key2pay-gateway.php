@@ -4,7 +4,7 @@
  * Plugin Name: WooCommerce Key2Pay Gateway
  * Plugin URI:  https://axons.com/
  * Description: A secure redirect-based WooCommerce payment gateway for Key2Pay.
- * Version:     1.0.0
+ * Version:     1.0.1
  * Author:      Nikola Stanin 
  * Author URI:  https://nikolastanin.com/
  * Text Domain: key2pay
