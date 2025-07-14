@@ -1,0 +1,100 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Key2Pay Gateway 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-27 10:00+0000\n"
+"PO-Revision-Date: 2025-01-27 10:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+msgid "Key2Pay Secure Redirect"
+msgstr "Key2Pay セキュアリダイレクト"
+
+msgid "Accept payments via Key2Pay with maximum security. Customers are redirected to Key2Pay's hosted payment page."
+msgstr "Key2Payを使用して最大限のセキュリティで支払いを受け付けます。お客様はKey2Payのホストされた支払いページにリダイレクトされます。"
+
+msgid "Pay securely using Key2Pay. You will be redirected to complete your payment securely."
+msgstr "Key2Payを使用して安全に支払いを行ってください。支払いを完了するために安全なページにリダイレクトされます。"
+
+msgid "Enable/Disable"
+msgstr "有効/無効"
+
+msgid "Enable Key2Pay Secure Redirect"
+msgstr "Key2Payセキュアリダイレクトを有効にする"
+
+msgid "Title"
+msgstr "タイトル"
+
+msgid "This controls the title which the user sees during checkout."
+msgstr "チェックアウト時にユーザーが表示するタイトルを制御します。"
+
+msgid "Description"
+msgstr "説明"
+
+msgid "This controls the description which the user sees during checkout."
+msgstr "チェックアウト時にユーザーが表示する説明を制御します。"
+
+msgid "Authentication Settings"
+msgstr "認証設定"
+
+msgid "Configure how to authenticate with Key2Pay API."
+msgstr "Key2Pay APIとの認証方法を設定します。"
+
+msgid "Authentication Method"
+msgstr "認証方法"
+
+msgid "Choose the authentication method for Key2Pay API."
+msgstr "Key2Pay APIの認証方法を選択してください。"
+
+msgid "Basic (Merchant ID + Password)"
+msgstr "基本（マーチャントID + パスワード）"
+
+msgid "API Key"
+msgstr "APIキー"
+
+msgid "Bearer Token"
+msgstr "ベアラートークン"
+
+msgid "HMAC Signed"
+msgstr "HMAC署名"
+
+msgid "Merchant ID"
+msgstr "マーチャントID"
+
+msgid "Your Key2Pay Merchant ID (required for Basic authentication)."
+msgstr "Key2PayマーチャントID（基本認証に必要）。"
+
+msgid "Password"
+msgstr "パスワード"
+
+msgid "Your Key2Pay API Password (required for Basic authentication)."
+msgstr "Key2Pay APIパスワード（基本認証に必要）。"
+
+msgid "Your Key2Pay API Key (required for API Key and HMAC authentication)."
+msgstr "Key2Pay APIキー（APIキー認証とHMAC認証に必要）。"
+
+msgid "Secret Key"
+msgstr "シークレットキー"
+
+msgid "Your Key2Pay Secret Key (required for HMAC authentication and webhook verification)."
+msgstr "Key2Payシークレットキー（HMAC認証とwebhook検証に必要）。"
+
+msgid "Access Token"
+msgstr "アクセストークン"
+
+msgid "Your Key2Pay Access Token (required for Bearer authentication)."
+msgstr "Key2Payアクセストークン（ベアラー認証に必要）。"
+
+msgid "Debug Log"
+msgstr "デバッグログ"
+
+msgid "Enable logging"
+msgstr "ログを有効にする"
+
+msgid "Log Key2Pay redirect events."
+msgstr "Key2Payリダイレクトイベントをログに記録します。" 
