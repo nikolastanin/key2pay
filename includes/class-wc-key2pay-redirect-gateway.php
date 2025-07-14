@@ -210,8 +210,7 @@ class WC_Key2Pay_Redirect_Gateway extends WC_Payment_Gateway
         $log_message = '[' . date('Y-m-d H:i:s') . '] Key2Pay Debug: Redirect gateway - Order currency: ' . $currency . ', Amount: ' . $amount . PHP_EOL;
         error_log($log_message, 3, $log_file);
         
-        $site_language = substr(get_bloginfo('language'), 0, 2);
-        $log_message = '[' . date('Y-m-d H:i:s') . '] Key2Pay Debug: Redirect gateway - Site language: ' . $site_language . ' (from: ' . get_bloginfo('language') . ')' . PHP_EOL;
+        $log_message = '[' . date('Y-m-d H:i:s') . '] Key2Pay Debug: Redirect gateway - Using hardcoded language: en' . PHP_EOL;
         error_log($log_message, 3, $log_file);
 
         // Use credentials from settings (with fallback to hardcoded)
@@ -234,7 +233,7 @@ class WC_Key2Pay_Redirect_Gateway extends WC_Payment_Gateway
             'bill_address'      => $order->get_billing_address_1() ?: 'test',
             'bill_zip'          => $order->get_billing_postcode(),
             'serverUrl'         => $server_url, // Required for webhooks
-            'lang'              => substr(get_bloginfo('language'), 0, 2), // Dynamic language from WordPress settings
+            'lang'              => 'en', // Always use English language
         );
 
         // Get authentication headers
