@@ -5,8 +5,8 @@
  * Plugin URI:  https://axons.com/
  * Description: A secure redirect-based WooCommerce payment gateway for Key2Pay.
  * Version:     1.0.0
- * Author:      AX
- * Author URI:  https://axons.com/
+ * Author:      Nikola Stanin 
+ * Author URI:  https://nikolastanin.com/
  * Text Domain: key2pay
  * Domain Path: /languages
  * WC requires at least: 8.0
