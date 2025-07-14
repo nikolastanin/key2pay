@@ -97,4 +97,49 @@ msgid "Enable logging"
 msgstr "Omogući logovanje"
 
 msgid "Log Key2Pay redirect events."
-msgstr "Loguj Key2Pay preusmeravanje događaje." 
+msgstr "Loguj Key2Pay preusmeravanje događaje."
+
+msgid "Payment approved successfully."
+msgstr "Plaćanje uspešno odobreno."
+
+msgid "Payment failed: Insufficient funds in the account."
+msgstr "Plaćanje neuspešno: Nedovoljno sredstava na računu."
+
+msgid "Payment failed: Do not honour - the transaction was declined by the bank."
+msgstr "Plaćanje neuspešno: Ne poštuj - transakcija je odbijena od strane banke."
+
+msgid "Payment failed: Restricted card - this card cannot be used for this transaction."
+msgstr "Plaćanje neuspešno: Ograničena kartica - ova kartica se ne može koristiti za ovu transakciju."
+
+msgid "Payment failed: Invalid transaction - the transaction details are not valid."
+msgstr "Plaćanje neuspešno: Nevažeća transakcija - detalji transakcije nisu validni."
+
+msgid "Payment failed: Transaction timeout - the request took too long to process."
+msgstr "Plaćanje neuspešno: Istek vremena transakcije - zahtev je predugo trajao za obradu."
+
+msgid "Payment processed with unknown response code."
+msgstr "Plaćanje obrađeno sa nepoznatim kodom odgovora."
+
+msgid "Your payment has been approved successfully!"
+msgstr "Vaše plaćanje je uspešno odobreno!"
+
+msgid "Sorry, your payment could not be processed due to insufficient funds. Please check your account balance and try again."
+msgstr "Žao nam je, vaše plaćanje nije moglo biti obrađeno zbog nedovoljno sredstava. Molimo proverite stanje vašeg računa i pokušajte ponovo."
+
+msgid "Sorry, your payment was declined by your bank. Please contact your bank or try a different payment method."
+msgstr "Žao nam je, vaše plaćanje je odbila vaša banka. Molimo kontaktirajte vašu banku ili pokušajte drugi način plaćanja."
+
+msgid "Sorry, this card cannot be used for this transaction. Please try a different card or contact your bank."
+msgstr "Žao nam je, ova kartica se ne može koristiti za ovu transakciju. Molimo pokušajte drugu karticu ili kontaktirajte vašu banku."
+
+msgid "Sorry, there was an issue with the transaction details. Please check your information and try again."
+msgstr "Žao nam je, došlo je do problema sa detaljima transakcije. Molimo proverite vaše informacije i pokušajte ponovo."
+
+msgid "Sorry, the payment request timed out. Please try again or contact support if the problem persists."
+msgstr "Žao nam je, zahtev za plaćanje je istekao. Molimo pokušajte ponovo ili kontaktirajte podršku ako se problem nastavi."
+
+msgid "Sorry, there was an unexpected issue with your payment. Please try again or contact support."
+msgstr "Žao nam je, došlo je do neočekivanog problema sa vašim plaćanjem. Molimo pokušajte ponovo ili kontaktirajte podršku."
+
+msgid "Your credit card payment was not successful. Please try again or contact support if you believe this is an error."
+msgstr "Vaše plaćanje kreditnom karticom nije bilo uspešno. Molimo pokušajte ponovo ili kontaktirajte podršku ako smatrate da je ovo greška." 

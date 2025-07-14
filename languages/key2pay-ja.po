@@ -97,4 +97,49 @@ msgid "Enable logging"
 msgstr "ログを有効にする"
 
 msgid "Log Key2Pay redirect events."
-msgstr "Key2Payリダイレクトイベントをログに記録します。" 
+msgstr "Key2Payリダイレクトイベントをログに記録します。"
+
+msgid "Payment approved successfully."
+msgstr "支払いが正常に承認されました。"
+
+msgid "Payment failed: Insufficient funds in the account."
+msgstr "支払い失敗：口座残高不足。"
+
+msgid "Payment failed: Do not honour - the transaction was declined by the bank."
+msgstr "支払い失敗：不承認 - 銀行によって取引が拒否されました。"
+
+msgid "Payment failed: Restricted card - this card cannot be used for this transaction."
+msgstr "支払い失敗：制限されたカード - このカードはこの取引に使用できません。"
+
+msgid "Payment failed: Invalid transaction - the transaction details are not valid."
+msgstr "支払い失敗：無効な取引 - 取引詳細が無効です。"
+
+msgid "Payment failed: Transaction timeout - the request took too long to process."
+msgstr "支払い失敗：取引タイムアウト - リクエストの処理に時間がかかりすぎました。"
+
+msgid "Payment processed with unknown response code."
+msgstr "不明な応答コードで支払いが処理されました。"
+
+msgid "Your payment has been approved successfully!"
+msgstr "お支払いが正常に承認されました！"
+
+msgid "Sorry, your payment could not be processed due to insufficient funds. Please check your account balance and try again."
+msgstr "申し訳ございませんが、残高不足のためお支払いを処理できませんでした。口座残高をご確認の上、再度お試しください。"
+
+msgid "Sorry, your payment was declined by your bank. Please contact your bank or try a different payment method."
+msgstr "申し訳ございませんが、お支払いが銀行によって拒否されました。銀行にお問い合わせいただくか、別の支払い方法をお試しください。"
+
+msgid "Sorry, this card cannot be used for this transaction. Please try a different card or contact your bank."
+msgstr "申し訳ございませんが、このカードはこの取引に使用できません。別のカードをお試しいただくか、銀行にお問い合わせください。"
+
+msgid "Sorry, there was an issue with the transaction details. Please check your information and try again."
+msgstr "申し訳ございませんが、取引詳細に問題がありました。情報をご確認の上、再度お試しください。"
+
+msgid "Sorry, the payment request timed out. Please try again or contact support if the problem persists."
+msgstr "申し訳ございませんが、支払いリクエストがタイムアウトしました。再度お試しいただくか、問題が続く場合はサポートにお問い合わせください。"
+
+msgid "Sorry, there was an unexpected issue with your payment. Please try again or contact support."
+msgstr "申し訳ございませんが、お支払いで予期しない問題が発生しました。再度お試しいただくか、サポートにお問い合わせください。"
+
+msgid "Your credit card payment was not successful. Please try again or contact support if you believe this is an error."
+msgstr "クレジットカードでのお支払いが成功しませんでした。再度お試しいただくか、エラーだと思われる場合はサポートにお問い合わせください。" 

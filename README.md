@@ -50,18 +50,28 @@ Before going live, ensure you have:
 
 ## 📊 Gateway Response Code Handling
 
-The plugin now comprehensively handles all Key2Pay gateway response codes:
+The plugin now comprehensively handles all Key2Pay gateway response codes with **descriptive error messages**:
 
 - **0**: **Approved** → Order marked as paid
-- **51**: **Insufficient Funds** → Order marked as failed
-- **05**: **Do Not Honour** → Order marked as failed  
-- **62**: **Restricted Card** → Order marked as failed
-- **12**: **Invalid Transaction** → Order marked as failed
-- **9998**: **Timeout** → Order marked as failed
+- **51**: **Insufficient Funds** → Order marked as failed with user-friendly message
+- **05**: **Do Not Honour** → Order marked as failed with user-friendly message
+- **62**: **Restricted Card** → Order marked as failed with user-friendly message
+- **12**: **Invalid Transaction** → Order marked as failed with user-friendly message
+- **9998**: **Timeout** → Order marked as failed with user-friendly message
 - **Other codes**: **Approved** → Order marked as paid (as per Key2Pay documentation)
 - **CAPTURED**: **Legacy support** → Order marked as paid
 
 **Note**: The plugin automatically handles currency-prefixed response codes (e.g., "EGP9998" → "9998", "USD51" → "51").
+
+### 🎯 Enhanced Error Messages
+
+The plugin now provides:
+- **Technical messages** for admin order notes and logs
+- **User-friendly messages** for customer display
+- **Multi-language support** (English, Serbian, Japanese)
+- **Specific guidance** for each error type
+
+See [ERROR_MESSAGES.md](ERROR_MESSAGES.md) for complete details on the error message system.
 
 ### 🧪 Testing with Specific Amounts
 

@@ -140,4 +140,64 @@ msgstr ""
 
 #: includes/class-wc-key2pay-redirect-gateway.php:183
 msgid "Log Key2Pay redirect events."
+msgstr ""
+
+#: includes/class-wc-key2pay-redirect-gateway.php:750
+msgid "Payment approved successfully."
+msgstr ""
+
+#: includes/class-wc-key2pay-redirect-gateway.php:751
+msgid "Payment failed: Insufficient funds in the account."
+msgstr ""
+
+#: includes/class-wc-key2pay-redirect-gateway.php:752
+msgid "Payment failed: Do not honour - the transaction was declined by the bank."
+msgstr ""
+
+#: includes/class-wc-key2pay-redirect-gateway.php:753
+msgid "Payment failed: Restricted card - this card cannot be used for this transaction."
+msgstr ""
+
+#: includes/class-wc-key2pay-redirect-gateway.php:754
+msgid "Payment failed: Invalid transaction - the transaction details are not valid."
+msgstr ""
+
+#: includes/class-wc-key2pay-redirect-gateway.php:755
+msgid "Payment failed: Transaction timeout - the request took too long to process."
+msgstr ""
+
+#: includes/class-wc-key2pay-redirect-gateway.php:756
+msgid "Payment processed with unknown response code."
+msgstr ""
+
+#: includes/class-wc-key2pay-redirect-gateway.php:770
+msgid "Your payment has been approved successfully!"
+msgstr ""
+
+#: includes/class-wc-key2pay-redirect-gateway.php:771
+msgid "Sorry, your payment could not be processed due to insufficient funds. Please check your account balance and try again."
+msgstr ""
+
+#: includes/class-wc-key2pay-redirect-gateway.php:772
+msgid "Sorry, your payment was declined by your bank. Please contact your bank or try a different payment method."
+msgstr ""
+
+#: includes/class-wc-key2pay-redirect-gateway.php:773
+msgid "Sorry, this card cannot be used for this transaction. Please try a different card or contact your bank."
+msgstr ""
+
+#: includes/class-wc-key2pay-redirect-gateway.php:774
+msgid "Sorry, there was an issue with the transaction details. Please check your information and try again."
+msgstr ""
+
+#: includes/class-wc-key2pay-redirect-gateway.php:775
+msgid "Sorry, the payment request timed out. Please try again or contact support if the problem persists."
+msgstr ""
+
+#: includes/class-wc-key2pay-redirect-gateway.php:776
+msgid "Sorry, there was an unexpected issue with your payment. Please try again or contact support."
+msgstr ""
+
+#: includes/class-wc-key2pay-redirect-gateway.php:800
+msgid "Your credit card payment was not successful. Please try again or contact support if you believe this is an error."
 msgstr "" 

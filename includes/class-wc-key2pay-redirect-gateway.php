@@ -420,7 +420,9 @@ class WC_Key2Pay_Redirect_Gateway extends WC_Payment_Gateway
         } elseif ($order->has_status('processing') || $order->has_status('completed')) {
             echo wpautop(wp_kses_post(__('Thank you! Your credit card payment has been confirmed and your order is being processed.', 'key2pay')));
         } elseif ($order->has_status('failed')) {
-            echo wpautop(wp_kses_post(__('Your credit card payment was not successful. Please try again or contact support if you believe this is an error.', 'key2pay')));
+            // Get the specific error message for failed orders
+            $failed_message = $this->get_user_friendly_error_message_for_failed_order($order);
+            echo wpautop(wp_kses_post($failed_message));
         } else {
             echo wpautop(wp_kses_post(__('Thank you for your order. We will process your credit card payment shortly.', 'key2pay')));
         }
@@ -623,46 +625,49 @@ class WC_Key2Pay_Redirect_Gateway extends WC_Payment_Gateway
             $this->log->debug('Key2Pay Credit Card: Processing response code: ' . $numeric_code . ' for order #' . $order->get_id(), array('source' => 'key2pay-redirect'));
         }
         
+        // Get descriptive message for this status code
+        $status_message = $this->get_status_code_message($numeric_code);
+        
         // Handle different gateway response codes for credit card payments
         if ($this->is_approved_code($numeric_code)) {
             // 0 - Approved
             $order->payment_complete($transaction_id);
-            $order->add_order_note(sprintf(__('Key2Pay credit card payment approved. Transaction ID: %s, Code: %s', 'key2pay'), $transaction_id, $numeric_code));
+            $order->add_order_note(sprintf(__('Key2Pay credit card payment approved. Transaction ID: %s, Code: %s - %s', 'key2pay'), $transaction_id, $numeric_code, $status_message));
             
             if ($this->debug) {
                 $this->log->debug('Key2Pay Credit Card: Order #' . $order->get_id() . ' marked as paid (Code: ' . $numeric_code . ')', array('source' => 'key2pay-redirect'));
             }
         } elseif ($this->is_insufficient_funds_code($numeric_code)) {
             // 51 - INSUFFICIENT FUNDS
-            $order->update_status('failed', sprintf(__('Key2Pay credit card payment failed: Insufficient funds. Code: %s, Error: %s', 'key2pay'), $numeric_code, $error_text));
+            $order->update_status('failed', sprintf(__('Key2Pay credit card payment failed: %s. Code: %s, Error: %s', 'key2pay'), $this->get_status_code_message($numeric_code), $numeric_code, $error_text));
             
             if ($this->debug) {
                 $this->log->debug('Key2Pay Credit Card: Order #' . $order->get_id() . ' failed - insufficient funds (Code: ' . $numeric_code . ')', array('source' => 'key2pay-redirect'));
             }
         } elseif ($this->is_do_not_honour_code($numeric_code)) {
             // 05 - DNH (Do not honour)
-            $order->update_status('failed', sprintf(__('Key2Pay credit card payment failed: Do not honour. Code: %s, Error: %s', 'key2pay'), $numeric_code, $error_text));
+            $order->update_status('failed', sprintf(__('Key2Pay credit card payment failed: %s. Code: %s, Error: %s', 'key2pay'), $this->get_status_code_message($numeric_code), $numeric_code, $error_text));
             
             if ($this->debug) {
                 $this->log->debug('Key2Pay Credit Card: Order #' . $order->get_id() . ' failed - do not honour (Code: ' . $numeric_code . ')', array('source' => 'key2pay-redirect'));
             }
         } elseif ($this->is_restricted_card_code($numeric_code)) {
             // 62 - RESTRICTED CARDS
-            $order->update_status('failed', sprintf(__('Key2Pay credit card payment failed: Restricted card. Code: %s, Error: %s', 'key2pay'), $numeric_code, $error_text));
+            $order->update_status('failed', sprintf(__('Key2Pay credit card payment failed: %s. Code: %s, Error: %s', 'key2pay'), $this->get_status_code_message($numeric_code), $numeric_code, $error_text));
             
             if ($this->debug) {
                 $this->log->debug('Key2Pay Credit Card: Order #' . $order->get_id() . ' failed - restricted card (Code: ' . $numeric_code . ')', array('source' => 'key2pay-redirect'));
             }
         } elseif ($this->is_invalid_transaction_code($numeric_code)) {
             // 12 - INVALID TRANSACTION
-            $order->update_status('failed', sprintf(__('Key2Pay credit card payment failed: Invalid transaction. Code: %s, Error: %s', 'key2pay'), $numeric_code, $error_text));
+            $order->update_status('failed', sprintf(__('Key2Pay credit card payment failed: %s. Code: %s, Error: %s', 'key2pay'), $this->get_status_code_message($numeric_code), $numeric_code, $error_text));
             
             if ($this->debug) {
                 $this->log->debug('Key2Pay Credit Card: Order #' . $order->get_id() . ' failed - invalid transaction (Code: ' . $numeric_code . ')', array('source' => 'key2pay-redirect'));
             }
         } elseif ($numeric_code === '9998') {
             // 9998 - TIMEOUT
-            $order->update_status('failed', sprintf(__('Key2Pay credit card payment failed: Timeout. Code: %s, Error: %s', 'key2pay'), $numeric_code, $error_text));
+            $order->update_status('failed', sprintf(__('Key2Pay credit card payment failed: %s. Code: %s, Error: %s', 'key2pay'), $this->get_status_code_message($numeric_code), $numeric_code, $error_text));
             
             if ($this->debug) {
                 $this->log->debug('Key2Pay Credit Card: Order #' . $order->get_id() . ' failed - timeout (Code: ' . $numeric_code . ')', array('source' => 'key2pay-redirect'));
@@ -678,7 +683,7 @@ class WC_Key2Pay_Redirect_Gateway extends WC_Payment_Gateway
         } else {
             // Any other code not in the list - treat as approved (as per Key2Pay documentation)
             $order->payment_complete($transaction_id);
-            $order->add_order_note(sprintf(__('Key2Pay credit card payment approved (unknown code). Transaction ID: %s, Code: %s', 'key2pay'), $transaction_id, $numeric_code));
+            $order->add_order_note(sprintf(__('Key2Pay credit card payment approved (unknown code). Transaction ID: %s, Code: %s - %s', 'key2pay'), $transaction_id, $numeric_code, $this->get_status_code_message($numeric_code)));
             
             if ($this->debug) {
                 $this->log->debug('Key2Pay Credit Card: Order #' . $order->get_id() . ' marked as paid (unknown code: ' . $numeric_code . ')', array('source' => 'key2pay-redirect'));
@@ -742,6 +747,95 @@ class WC_Key2Pay_Redirect_Gateway extends WC_Payment_Gateway
     }
 
 
+
+    /**
+     * Get descriptive error message for a specific status code.
+     *
+     * @param string $code The response code.
+     * @return string The descriptive error message.
+     */
+    private function get_status_code_message($code)
+    {
+        switch ($code) {
+            case '0':
+                return __('Payment approved successfully.', 'key2pay');
+            case '51':
+                return __('Payment failed: Insufficient funds in the account.', 'key2pay');
+            case '05':
+                return __('Payment failed: Do not honour - the transaction was declined by the bank.', 'key2pay');
+            case '62':
+                return __('Payment failed: Restricted card - this card cannot be used for this transaction.', 'key2pay');
+            case '12':
+                return __('Payment failed: Invalid transaction - the transaction details are not valid.', 'key2pay');
+            case '9998':
+                return __('Payment failed: Transaction timeout - the request took too long to process.', 'key2pay');
+            default:
+                return __('Payment processed with unknown response code.', 'key2pay');
+        }
+    }
+
+    /**
+     * Get user-friendly error message for display to customers.
+     *
+     * @param string $code The response code.
+     * @return string The user-friendly error message.
+     */
+    private function get_user_friendly_error_message($code)
+    {
+        switch ($code) {
+            case '0':
+                return __('Your payment has been approved successfully!', 'key2pay');
+            case '51':
+                return __('Sorry, your payment could not be processed due to insufficient funds. Please check your account balance and try again.', 'key2pay');
+            case '05':
+                return __('Sorry, your payment was declined by your bank. Please contact your bank or try a different payment method.', 'key2pay');
+            case '62':
+                return __('Sorry, this card cannot be used for this transaction. Please try a different card or contact your bank.', 'key2pay');
+            case '12':
+                return __('Sorry, there was an issue with the transaction details. Please check your information and try again.', 'key2pay');
+            case '9998':
+                return __('Sorry, the payment request timed out. Please try again or contact support if the problem persists.', 'key2pay');
+            default:
+                return __('Sorry, there was an unexpected issue with your payment. Please try again or contact support.', 'key2pay');
+        }
+    }
+
+    /**
+     * Get user-friendly error message for a failed order by checking order notes.
+     *
+     * @param WC_Order $order Order object.
+     * @return string The user-friendly error message.
+     */
+    private function get_user_friendly_error_message_for_failed_order($order)
+    {
+        // Get the latest order notes to find the error code
+        $notes = wc_get_order_notes(array(
+            'order_id' => $order->get_id(),
+            'type' => 'customer',
+            'limit' => 10
+        ));
+        
+        // Look for Key2Pay error codes in the notes
+        foreach ($notes as $note) {
+            $content = $note->content;
+            
+            // Check for specific error codes in the note content
+            if (strpos($content, 'Code: 51') !== false) {
+                return $this->get_user_friendly_error_message('51');
+            } elseif (strpos($content, 'Code: 05') !== false) {
+                return $this->get_user_friendly_error_message('05');
+            } elseif (strpos($content, 'Code: 62') !== false) {
+                return $this->get_user_friendly_error_message('62');
+            } elseif (strpos($content, 'Code: 12') !== false) {
+                return $this->get_user_friendly_error_message('12');
+            } elseif (strpos($content, 'Code: 9998') !== false) {
+                return $this->get_user_friendly_error_message('9998');
+            }
+        }
+        
+        // Default message if no specific error code found
+        return __('Your credit card payment was not successful. Please try again or contact support if you believe this is an error.', 'key2pay');
+    }
 
     /**
      * Extract numeric code from response code, handling currency prefixes.
